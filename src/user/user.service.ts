@@ -52,7 +52,7 @@ export class UserService {
 			const currency = [Currency.RUB, Currency.USD, Currency.EUR];
 			let wallets = [];
 
-			for (let i = 0; i < 2; i++) {
+			for (let i = 0; i < 3; i++) {
 				const newWallet = new Wallet(this.getRandomInt(), currency[i], 0);
 
 				await this.walletRepo.save(newWallet);
