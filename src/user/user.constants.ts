@@ -1,0 +1,1 @@
+export const USER_NOT_FOUND_ERROR = 'Пользатель с таким id не найден'
