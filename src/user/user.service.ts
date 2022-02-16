@@ -34,9 +34,13 @@ export class UserService {
 
 			await this.userRepo.save(newUser);
 
+			if (!newUser) {
+				console.log('createUser method error');
+			}
+
 			return newUser;
 		} catch (error) {
-			console.log(error, '\ncreateUser method error\n');
+			console.log(error, 'createUser method error');
 
 			throw error;
 		}
@@ -44,18 +48,28 @@ export class UserService {
 
 	// Не мапинг, потому что возвращает : Promise<Promise<Wallet>[]>
 	async createWallets(): Promise<Wallet[]> {
-		const currency = [Currency.RUB, Currency.USD, Currency.EUR];
-		let wallets = [];
+		try {
+			const currency = [Currency.RUB, Currency.USD, Currency.EUR];
+			let wallets = [];
 
-		for (let i = 0; i < 3; i++) {
-			const newWallet = new Wallet(this.getRandomInt(), currency[i], 0);
+			for (let i = 0; i < 2; i++) {
+				const newWallet = new Wallet(this.getRandomInt(), currency[i], 0);
 
-			await this.walletRepo.save(newWallet);
+				await this.walletRepo.save(newWallet);
 
-			wallets.push(newWallet);
+				wallets.push(newWallet);
+			}
+
+			if (wallets.length != 3) {
+				throw new BadRequestException('createWallets method error');
+			}
+
+			return wallets;
+		} catch (error) {
+			console.log(error, 'reateWallets method error');
+
+			throw error;
 		}
-
-		return wallets;
 	}
 
 
@@ -75,7 +89,7 @@ export class UserService {
 				throw new BadRequestException(ALREADY_REGISTERED_ERROR);
 			}
 		} catch (error) {
-			console.log(error, '\nfindRegisteredUser method error\n');
+			console.log(error, 'findRegisteredUser method error');
 
 			throw error;
 		}
@@ -94,7 +108,7 @@ export class UserService {
 
 			return user;
 		} catch (error) {
-			console.log(error, '\nfindUserById method error\n');
+			console.log(error, 'findUserById method error');
 
 			throw error;
 		}
@@ -111,7 +125,7 @@ export class UserService {
 
 			await this.userRepo.delete(user);
 		} catch (error) {
-			console.log(error, '\ndeleteUserById method error\n');
+			console.log(error, 'deleteUserById method error');
 
 			throw error;
 		}
