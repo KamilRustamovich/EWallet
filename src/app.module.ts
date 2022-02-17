@@ -5,6 +5,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeOrmConfig } from './configs/typeorm.config';
 import { UserModule } from './user/user.module';
+import { WalletModule } from './wallet/wallet.module';
 
 @Module({
 	imports: [
@@ -13,6 +14,7 @@ import { UserModule } from './user/user.module';
 		TypeOrmModule.forRootAsync(typeOrmConfig),
 		AuthModule,
 		UserModule,
+		WalletModule,
 	]
 })
 export class AppModule { }

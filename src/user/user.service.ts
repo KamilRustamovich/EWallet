@@ -2,11 +2,11 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { genSalt, hash } from 'bcryptjs';
 import { ALREADY_REGISTERED_ERROR, USER_NOT_FOUND_ERROR } from 'src/auth/auth.constants';
-import { $enum } from 'ts-enum-util';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './entities/user.entity';
-import { Currency, Wallet } from './entities/wallet.entity';
+import { Currency, Wallet } from '../wallet/entitites/wallet.entity';
+import { ACCOUNT_NUMBER_NOT_FOUND_ERROR } from './user.constants';
 
 
 @Injectable()
@@ -24,12 +24,10 @@ export class UserService {
 		try {
 			await this.findRegisteredUser(userDto.email);
 
-			const salt = await genSalt(10);
-			const passHash = await hash(userDto.password, salt);
-
 			const newUser = new User();
+
 			newUser.email = userDto.email;
-			newUser.passwordHash = passHash;
+			newUser.passwordHash = await this.passwordHash(userDto.password);
 			newUser.wallets = await this.createWallets();
 
 			await this.userRepo.save(newUser);
@@ -45,6 +43,15 @@ export class UserService {
 			throw error;
 		}
 	}
+
+	
+	async passwordHash(password: string): Promise<string> {
+		const salt = await genSalt(10);
+		const pwdHash = await hash(password, salt);
+
+		return pwdHash;
+	}
+
 
 	// Не мапинг, потому что возвращает : Promise<Promise<Wallet>[]>
 	async createWallets(): Promise<Wallet[]> {
@@ -126,6 +133,25 @@ export class UserService {
 			await this.userRepo.delete(user);
 		} catch (error) {
 			console.log(error, 'deleteUserById method error');
+
+			throw error;
+		}
+	}
+
+
+	async findUserByAccountNumber(account_number: number): Promise<Wallet> {
+		try {
+			const user = await this.walletRepo.findOne(account_number, {
+				relations: ['users']
+			})
+
+			if (!user) {
+				throw new BadRequestException(ACCOUNT_NUMBER_NOT_FOUND_ERROR);
+			}
+
+			return user;
+		} catch (error) {
+			console.log(error, 'findUserByAccountNumber method error');
 
 			throw error;
 		}

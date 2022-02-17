@@ -1,5 +1,5 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { User } from './user.entity';
+import { User } from '../../user/entities/user.entity';
 
 export enum Currency {
 	RUB = 'RUB',
@@ -23,7 +23,7 @@ export class Wallet {
 	balance: number;
 
 	@ManyToOne(() => User, user => user.wallets)
-	user: User;
+	users: User;
 
 	constructor(acc_number: number, curr: Currency, bal: number) {
 		this.account_number = acc_number;
